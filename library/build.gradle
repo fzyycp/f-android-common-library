@@ -22,6 +22,9 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile group: 'com.nostra13.universalimageloader', name: 'universal-image-loader', version: '1.9.5'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.9.1'
 }
 
 publish {

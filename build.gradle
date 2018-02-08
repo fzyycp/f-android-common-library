@@ -2,9 +2,6 @@
 
 buildscript {
     repositories {
-        maven{
-            url="http://128.0.9.253:8081/nexus/content/groups/public/"
-        }
         maven {
             url = "https://dl.bintray.com/faury/maven"
         }
@@ -22,9 +19,6 @@ buildscript {
 
 allprojects {
     repositories {
-        maven{
-            url="http://128.0.9.253:8081/nexus/content/groups/public/"
-        }
         maven {
             url = "https://dl.bintray.com/faury/maven"
         }
