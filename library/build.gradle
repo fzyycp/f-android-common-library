@@ -1,0 +1,36 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 27
+        versionCode 1
+        versionName "0.0.1"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+publish {
+// gradlew clean build bintrayUpload -PbintrayUser=用户名 -PbintrayKey=apikey -PdryRun=false
+    userOrg = 'faury'//bintray.com用户名
+    groupId = 'cn.faury.android.library'//jcenter上的路径
+    artifactId = 'f-android-common-library'//项目名称
+    publishVersion = '0.0.1'//版本号
+    desc = 'this is an andriod common library'//描述，不重要
+    website = 'https://github.com/fzyycp/f-android-common-library'//github上的地址
+}
+
