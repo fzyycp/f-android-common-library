@@ -6,10 +6,12 @@ import android.os.Environment;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -293,7 +295,7 @@ public class FileUtils {
 
         // 存在子文件或子文件夹
         if (allFiles != null) {
-            File[] allExtensionFiles = dir.listFiles(new FFileFilter(extensions));
+            File[] allExtensionFiles = dir.listFiles(new FileFilter(extensions));
             if (allExtensionFiles != null) {
                 for (File single : allExtensionFiles) {
                     files.add(single);
@@ -815,5 +817,35 @@ public class FileUtils {
             decimals = 2;
         }
         return covertFileSizeGB(size, decimals).divide(UNIT, decimals, BigDecimal.ROUND_HALF_EVEN);
+    }
+
+    /**
+     * 文件过滤器
+     */
+    public static class FileFilter implements FilenameFilter {
+
+        private List<String> extensions = new ArrayList<>();
+
+        public FileFilter(String... extensions) {
+            for (String extension : extensions) {
+                if (extension != null) {
+                    this.extensions.add(extension);
+                }
+            }
+        }
+
+        @Override
+        public boolean accept(File dir, String filename) {
+            boolean accept = false;
+            if (filename != null && filename.trim().length() > 0) {
+                for (String extension : extensions) {
+                    if (filename.endsWith(extension)) {
+                        accept = true;
+                        break;
+                    }
+                }
+            }
+            return accept;
+        }
     }
 }

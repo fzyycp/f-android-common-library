@@ -3,7 +3,7 @@ package cn.faury.android.library.common.core;
 /**
  * 全局常量
  */
-public final class FGlobalConstant {
+public final class FCommonConfigure {
 
     /**
      * 统一log前缀

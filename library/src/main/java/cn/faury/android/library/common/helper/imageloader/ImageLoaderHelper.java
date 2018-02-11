@@ -10,7 +10,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.io.File;
 
-import cn.faury.android.library.common.core.FGlobalConstant;
+import cn.faury.android.library.common.core.FCommonConfigure;
 import cn.faury.android.library.common.util.FileUtils;
 import cn.faury.android.library.common.util.StorageUtils;
 
@@ -33,7 +33,7 @@ public class ImageLoaderHelper {
                 .memoryCacheSizePercentage(13);
 
         try {//如果能够写入磁盘，则创建缓存目录
-            File file = new File(StorageUtils.getStorageFile(), FGlobalConstant.DIR_IMAGE_CACHE);
+            File file = new File(StorageUtils.getStorageFile(), FCommonConfigure.DIR_IMAGE_CACHE);
             if (!file.exists()) {
                 FileUtils.createFolder(file);
             }

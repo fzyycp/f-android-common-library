@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import cn.faury.android.library.common.core.FGlobalConstant;
-import cn.faury.android.library.common.helper.FLogger;
+import cn.faury.android.library.common.core.FCommonConfigure;
+import cn.faury.android.library.common.helper.Logger;
 import cn.faury.android.library.common.util.FileUtils;
 import cn.faury.android.library.common.util.StorageUtils;
 import cn.faury.android.library.common.util.StringUtils;
@@ -29,7 +29,7 @@ public class HttpRequest {
     /**
      * 日志tag
      */
-    private static final String TAG = FGlobalConstant.TAG + " - HttpRequest";
+    private static final String TAG = FCommonConfigure.TAG + " - HttpRequest";
 
     /**
      * 设置client对象
@@ -48,7 +48,7 @@ public class HttpRequest {
                     OkHttpClient.Builder builder = new OkHttpClient.Builder()
                             .connectTimeout(15, TimeUnit.SECONDS);
                     try {//如果能够写入磁盘，则创建缓存目录
-                        File file = new File(StorageUtils.getStorageFile(), FGlobalConstant.DIR_HTTP_CACHE);
+                        File file = new File(StorageUtils.getStorageFile(), FCommonConfigure.DIR_HTTP_CACHE);
                         if (!file.exists()) {
                             FileUtils.createFolder(file);
                         }
@@ -73,7 +73,7 @@ public class HttpRequest {
      * @param callback 回调
      */
     protected static void _request(final String method, final String url, final Map<String, String> params, final Callback callback) {
-        FLogger.d(TAG, String.format("_request: method=%s,url=%s,params=%s", method, url, params));
+        Logger.d(TAG, String.format("_request: method=%s,url=%s,params=%s", method, url, params));
         if (url == null) {
             return;
         }
@@ -144,7 +144,7 @@ public class HttpRequest {
      * @param downloadListener 下载监听器
      */
     public static void download(final String url, final String toPath, final OnDownloadListener downloadListener) {
-        FLogger.d(TAG, String.format("download: url=%s,toPath=%s", url, toPath));
+        Logger.d(TAG, String.format("download: url=%s,toPath=%s", url, toPath));
         if (StringUtils.isEmpty(url) || StringUtils.isEmpty(toPath)) {
             downloadListener.onDownloadFailed("下载地址或保存路径不可以为空",null);
         } else {

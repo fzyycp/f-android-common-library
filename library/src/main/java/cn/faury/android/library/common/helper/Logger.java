@@ -6,7 +6,7 @@ import android.util.Log;
  * 自定义日志辅助器
  */
 
-public final class FLogger {
+public final class Logger {
     /**
      * 开发模式
      */

@@ -3,8 +3,8 @@ package cn.faury.android.library.common.http;
 import java.io.IOException;
 import java.util.Map;
 
-import cn.faury.android.library.common.core.FGlobalConstant;
-import cn.faury.android.library.common.helper.FLogger;
+import cn.faury.android.library.common.core.FCommonConfigure;
+import cn.faury.android.library.common.helper.Logger;
 import cn.faury.android.library.common.util.JsonHashMapUtils;
 import cn.faury.android.library.common.util.JsonUtils;
 import cn.faury.android.library.common.util.StringUtils;
@@ -20,7 +20,7 @@ public class JsonHttpRequest extends HttpRequest {
     /**
      * 日志tag
      */
-    private static final String TAG = FGlobalConstant.TAG + " - JsonHttpRequest";
+    private static final String TAG = FCommonConfigure.TAG + " - JsonHttpRequest";
 
     /**
      * JSON请求
@@ -34,7 +34,7 @@ public class JsonHttpRequest extends HttpRequest {
         _request(method, url, params, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                FLogger.e(TAG, "onFailure: ", e);
+                Logger.e(TAG, "onFailure: ", e);
                 if (handler != null) {
                     handler.onFailure(e);
                 }
@@ -42,7 +42,7 @@ public class JsonHttpRequest extends HttpRequest {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                FLogger.e(TAG, "onResponse: " + response);
+                Logger.e(TAG, "onResponse: " + response);
                 if (handler != null) {
                     if (response.code() == 200) {
                         String resultJson = response.body().string();

@@ -23,16 +23,19 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile group: 'com.nostra13.universalimageloader', name: 'universal-image-loader', version: '1.9.5'
-    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.9.1'
+    implementation group: 'com.nostra13.universalimageloader', name: 'universal-image-loader', version: '1.9.5'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.9.1'
 }
 
 publish {
 // gradlew clean build bintrayUpload -PbintrayUser=用户名 -PbintrayKey=apikey -PdryRun=false
     userOrg = 'faury'//bintray.com用户名
+    bintrayUser = BINTRAY_USER
+    bintrayKey = BINTRAY_KEY
+    dryRun = false
     groupId = 'cn.faury.android.library'//jcenter上的路径
     artifactId = 'f-android-common-library'//项目名称
-    publishVersion = '0.0.1'//版本号
+    publishVersion = '0.0.2'//版本号
     desc = 'this is an andriod common library'//描述，不重要
     website = 'https://github.com/fzyycp/f-android-common-library'//github上的地址
 }
