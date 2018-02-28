@@ -35,7 +35,7 @@ publish {
     dryRun = false
     groupId = 'cn.faury.android.library'//jcenter上的路径
     artifactId = 'f-android-common-library'//项目名称
-    publishVersion = '0.0.2'//版本号
+    publishVersion = '0.0.3'//版本号
     desc = 'this is an andriod common library'//描述，不重要
     website = 'https://github.com/fzyycp/f-android-common-library'//github上的地址
 }
