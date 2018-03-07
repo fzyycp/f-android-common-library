@@ -2,6 +2,7 @@ package cn.faury.android.library.common.util;
 
 import android.content.Context;
 import android.os.Environment;
+import android.os.StatFs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -316,7 +317,7 @@ public class FileUtils {
     /**
      * 从asset文件夹拷贝文件到目标文件(文件已存在则放弃拷贝)
      *
-     * @param ctx 上下文
+     * @param ctx               上下文
      * @param strAssetsFilePath 源文件
      * @param strDesFilePath    目标文件
      * @return 是否拷贝成功
@@ -691,7 +692,7 @@ public class FileUtils {
      * 格式化url，去除？后参数
      *
      * @param url 要格式化的URL
-     *            @return 格式化的url
+     * @return 格式化的url
      */
 
     public static String formatUrl(String url) {
@@ -727,14 +728,49 @@ public class FileUtils {
     }
 
     /**
-     * 判断文件路径是否存在
+     * 判断路径是否存在
      *
      * @param path 路径
      * @return 是否存在
      */
     public static boolean exists(String path) {
-        File file = new File(Environment.getExternalStorageDirectory(), path);
-        return file.exists();
+        if (!isFilePath(path)) {
+            return false;
+        }
+        File file = getAbsoluteFile(path);
+        return file != null && file.exists();
+    }
+
+    /**
+     * 判断文件是否存在
+     *
+     * @param filePath the check file path
+     * @return true means exist
+     */
+    public static boolean isFileExist(String filePath) {
+
+        if (!isFilePath(filePath)) {
+            return false;
+        }
+
+        File file = new File(filePath);
+        return file != null && file.exists() && file.isFile();
+    }
+
+    /**
+     * 判断文件是否存在
+     *
+     * @param filePath the check file path
+     * @return true means exist
+     */
+    public static boolean isFolderExist(String filePath) {
+
+        if (!isFilePath(filePath)) {
+            return false;
+        }
+
+        File file = new File(filePath);
+        return file != null && file.exists() && file.isDirectory();
     }
 
     /**
@@ -817,6 +853,120 @@ public class FileUtils {
             decimals = 2;
         }
         return covertFileSizeGB(size, decimals).divide(UNIT, decimals, BigDecimal.ROUND_HALF_EVEN);
+    }
+
+
+    /**
+     * 创建父目录
+     *
+     * @param filePath 文件路径
+     * @return 是否成功
+     */
+    public static boolean createFileParentDir(String filePath) {
+        File file = new File(filePath);
+        if (file != null) {
+            if (file.exists()) {
+                return true;// parent dir exist
+            } else {
+                File parentFile = file.getParentFile();
+                if (parentFile != null) {
+                    if (parentFile.exists()) {
+                        return true;// parent dir exist
+                    } else {
+                        return parentFile.mkdirs();// create parent dir
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 获取文件后缀名
+     *
+     * @param filePath 文件路径
+     * @return 后缀名
+     */
+    public static String getFileSuffix(String filePath) {
+        if (StringUtils.isNotEmpty(filePath)) {
+            int start = filePath.lastIndexOf(".");
+            if (start != -1) {
+                return filePath.substring(start + 1);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 判断字符串是否为文件路径
+     *
+     * @param path file path
+     * @return true means the path is file path
+     */
+    public static boolean isFilePath(String path) {
+        if (StringUtils.isEmpty(path)) {
+            return false;
+        }
+        if (path.startsWith(File.separator)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 文件路径是否可写
+     *
+     * @param path 文件路径
+     * @return 是否可写
+     */
+    public static boolean canWrite(String path) {
+        // if sdcard,needs the permission:  android.permission.WRITE_EXTERNAL_STORAGE
+        if (isSDCardPath(path)) {
+            if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                return true;
+            }
+        } else {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断文件路径是否为SD卡路径
+     *
+     * @param path 文件路径
+     * @return 是否SD卡
+     */
+    public static boolean isSDCardPath(String path) {
+        if (StringUtils.isEmpty(path)) {
+            return false;
+        }
+        String sdRootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        if (path.startsWith(sdRootPath)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 获取可用空间
+     *
+     * @param fileDirPath 目录路径
+     * @return 可用空间，-1表示失败
+     */
+    public static long getAvailableSpace(String fileDirPath) {
+        try {
+            File file = new File(fileDirPath);
+            if (!file.exists()) {
+                file.mkdirs();// create to make sure it is not error below
+            }
+            final StatFs stats = new StatFs(fileDirPath);
+            long result = (long) stats.getBlockSize() * (long) stats.getAvailableBlocks();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     /**

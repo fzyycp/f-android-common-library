@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import cn.faury.android.library.common.core.FCommonConfigure;
+import cn.faury.android.library.common.core.FCommonGlobalConstant;
 import cn.faury.android.library.common.helper.Logger;
 import cn.faury.android.library.common.util.FileUtils;
 import cn.faury.android.library.common.util.StorageUtils;
@@ -16,6 +16,7 @@ import cn.faury.android.library.common.util.StringUtils;
 import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Dns;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -29,32 +30,74 @@ public class HttpRequest {
     /**
      * 日志tag
      */
-    private static final String TAG = FCommonConfigure.TAG + " - HttpRequest";
+    private final String TAG = FCommonGlobalConstant.TAG + " - HttpRequest";
 
     /**
      * 设置client对象
      */
-    private static OkHttpClient client = null;
+    private OkHttpClient client = null;
+
+    /**
+     * 获取DNS解析服务对象
+     * @return DNS解析服务
+     */
+    public Dns getDns(){
+        return null;
+    }
+
+    /**
+     * 获取超时时间
+     * @return 超时时间
+     */
+    public long getTimeout(){
+        return 15;
+    }
+
+    /**
+     * 超时时间单位
+     * @return 时间单位
+     */
+    public TimeUnit getTimeoutUnit(){
+        return TimeUnit.SECONDS;
+    }
+
+    /**
+     * 获取网络缓存大小
+     * @return 缓存大小
+     */
+    public long getCacheSize(){
+        return 10 * 1024 * 1024;
+    }
+
+    /**
+     * 获取缓存文件
+     * @return 缓存文件
+     */
+    public File getCacheFile(){
+        return new File(StorageUtils.getStorageFile(), FCommonGlobalConstant.DIR_HTTP_CACHE);
+    }
 
     /**
      * 获取网络请求对象
      *
      * @return 网络请求对象
      */
-    public static synchronized OkHttpClient getClient() {
+    public synchronized OkHttpClient getClient() {
         if (client == null) {
             synchronized (HttpRequest.class) {
                 if (client == null) {
                     OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                            .connectTimeout(15, TimeUnit.SECONDS);
+                            .connectTimeout(getTimeout(), getTimeoutUnit());
+                    if (this.getDns()!=null){
+                        builder.dns(this.getDns());
+                    }
                     try {//如果能够写入磁盘，则创建缓存目录
-                        File file = new File(StorageUtils.getStorageFile(), FCommonConfigure.DIR_HTTP_CACHE);
+                        File file = getCacheFile();
                         if (!file.exists()) {
                             FileUtils.createFolder(file);
                         }
-                        int cacheSize = 10 * 1024 * 1024;
-                        builder.cache(new Cache(file.getAbsoluteFile(), cacheSize));
-                    } catch (Exception e) {
+                        builder.cache(new Cache(file.getAbsoluteFile(), getCacheSize()));
+                    } catch (Exception ignored) {
                     }
                     client = builder.build();
                 }
@@ -72,7 +115,7 @@ public class HttpRequest {
      * @param params   请求参数
      * @param callback 回调
      */
-    protected static void _request(final String method, final String url, final Map<String, String> params, final Callback callback) {
+    protected void _request(final String method, final String url, final Map<String, String> params, final Callback callback) {
         Logger.d(TAG, String.format("_request: method=%s,url=%s,params=%s", method, url, params));
         if (url == null) {
             return;
@@ -121,7 +164,7 @@ public class HttpRequest {
      * @param params   请求的参数
      * @param callback 回调
      */
-    public static void get(final String url, final Map<String, String> params, final Callback callback) {
+    public void get(final String url, final Map<String, String> params, final Callback callback) {
         _request("GET", url, params, callback);
     }
 
@@ -132,7 +175,7 @@ public class HttpRequest {
      * @param params   请求的参数
      * @param callback 回调
      */
-    public static void post(final String url, final Map<String, String> params, final Callback callback) {
+    public void post(final String url, final Map<String, String> params, final Callback callback) {
         _request("POST", url, params, callback);
     }
 
@@ -143,7 +186,7 @@ public class HttpRequest {
      * @param toPath           文件保存路径，全路径，如果是以/结尾，则取url最后一段名作为文件名
      * @param downloadListener 下载监听器
      */
-    public static void download(final String url, final String toPath, final OnDownloadListener downloadListener) {
+    public void download(final String url, final String toPath, final OnDownloadListener downloadListener) {
         Logger.d(TAG, String.format("download: url=%s,toPath=%s", url, toPath));
         if (StringUtils.isEmpty(url) || StringUtils.isEmpty(toPath)) {
             downloadListener.onDownloadFailed("下载地址或保存路径不可以为空",null);
@@ -194,7 +237,9 @@ public class HttpRequest {
         }
     }
 
-
+    /**
+     * 下载监听器
+     */
     public interface OnDownloadListener {
         /**
          * 开始下载前

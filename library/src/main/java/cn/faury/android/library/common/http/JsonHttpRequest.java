@@ -3,7 +3,7 @@ package cn.faury.android.library.common.http;
 import java.io.IOException;
 import java.util.Map;
 
-import cn.faury.android.library.common.core.FCommonConfigure;
+import cn.faury.android.library.common.core.FCommonGlobalConstant;
 import cn.faury.android.library.common.helper.Logger;
 import cn.faury.android.library.common.util.JsonHashMapUtils;
 import cn.faury.android.library.common.util.JsonUtils;
@@ -20,7 +20,7 @@ public class JsonHttpRequest extends HttpRequest {
     /**
      * 日志tag
      */
-    private static final String TAG = FCommonConfigure.TAG + " - JsonHttpRequest";
+    private final String TAG = FCommonGlobalConstant.TAG + " - JsonHttpRequest";
 
     /**
      * JSON请求
@@ -30,7 +30,7 @@ public class JsonHttpRequest extends HttpRequest {
      * @param params  请求的参数
      * @param handler 处理返回结果
      */
-    protected static void _jsonRequest(String method, String url, Map<String, String> params, final ResponseHandler handler) {
+    protected void _jsonRequest(String method, String url, Map<String, String> params, final ResponseHandler handler) {
         _request(method, url, params, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -66,7 +66,7 @@ public class JsonHttpRequest extends HttpRequest {
      * @param params  请求的参数
      * @param handler 处理返回结果
      */
-    public static void get(String url, Map<String, String> params, final ResponseHandler handler) {
+    public void get(String url, Map<String, String> params, final ResponseHandler handler) {
         _jsonRequest("GET", url, params, handler);
     }
 
@@ -77,14 +77,13 @@ public class JsonHttpRequest extends HttpRequest {
      * @param params  请求的参数
      * @param handler 处理返回结果
      */
-    public static void post(String url, Map<String, String> params, final ResponseHandler handler) {
+    public void post(String url, Map<String, String> params, final ResponseHandler handler) {
         _jsonRequest("POST", url, params, handler);
     }
 
     /**
      * JSON请求处理器
      */
-
     public interface ResponseHandler {
 
         /**

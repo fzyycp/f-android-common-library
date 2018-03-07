@@ -3,7 +3,7 @@ package cn.faury.android.library.common.core;
 /**
  * 全局常量
  */
-public final class FCommonConfigure {
+public final class FCommonGlobalConstant {
 
     /**
      * 统一log前缀
@@ -13,7 +13,7 @@ public final class FCommonConfigure {
     /**
      * library在储存器上的根目录
      */
-    public static final String DIR_ROOT = ".cn.wassk.android.library";
+    public static final String DIR_ROOT = ".cn.faury.android.library";
 
     /**
      * 图片缓存路径
