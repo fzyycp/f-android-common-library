@@ -1,4 +1,4 @@
-package cn.faury.android.library.common.helper.sqlite;
+package cn.faury.android.library.common.helper.sqlite.dao;
 
 import android.database.sqlite.SQLiteDatabase;
 
