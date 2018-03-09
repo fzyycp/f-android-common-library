@@ -10,7 +10,8 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.io.File;
 
-import cn.faury.android.library.common.core.FCommonGlobalConstant;
+import cn.faury.android.library.common.core.FCommonGlobalConfigure;
+import cn.faury.android.library.common.helper.Logger;
 import cn.faury.android.library.common.util.FileUtils;
 import cn.faury.android.library.common.util.StorageUtils;
 
@@ -19,6 +20,8 @@ import cn.faury.android.library.common.util.StorageUtils;
  */
 
 public class ImageLoaderHelper {
+
+    private static final String TAG = FCommonGlobalConfigure.TAG + " - ImageLoaderHelper";
 
     /**
      * 获取默认的ImageLoader配置
@@ -33,13 +36,19 @@ public class ImageLoaderHelper {
                 .memoryCacheSizePercentage(13);
 
         try {//如果能够写入磁盘，则创建缓存目录
-            File file = new File(StorageUtils.getStorageFile(), FCommonGlobalConstant.DIR_IMAGE_CACHE);
+            File file = new File(StorageUtils.getStoragePackageDir(context), FCommonGlobalConfigure.DIR_IMAGE_CACHE);
             if (!file.exists()) {
                 FileUtils.createFolder(file);
             }
             builder.diskCache(new LruDiskCache(file, new HashCodeFileNameGenerator() // 磁盘缓存
                     , 50 * 1024 * 1024))
                     .diskCacheFileCount(100).writeDebugLogs();
+            Logger.v(TAG, "ImageLoaderConfiguration[threadPoolSize=3" +
+                    ",memoryCache-MyLruMemoryCache=2*1024*1024" +
+                    ",memoryCacheSizePercentage=13" +
+                    ",LruDiskCache=50*1024*1024" +
+                    ",diskCacheFileCount=100" +
+                    ",LruDiskCache-Path=" + file.getAbsolutePath() + "]");
 
         } catch (Exception ignored) {
         }

@@ -1,5 +1,7 @@
 package cn.faury.android.library.common.http;
 
+import android.content.Context;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,7 +10,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import cn.faury.android.library.common.core.FCommonGlobalConstant;
+import cn.faury.android.library.common.core.FCommonGlobalConfigure;
 import cn.faury.android.library.common.helper.Logger;
 import cn.faury.android.library.common.util.FileUtils;
 import cn.faury.android.library.common.util.StorageUtils;
@@ -30,7 +32,12 @@ public class HttpRequest {
     /**
      * 日志tag
      */
-    private final String TAG = FCommonGlobalConstant.TAG + " - HttpRequest";
+    private final String TAG = FCommonGlobalConfigure.TAG + " - HttpRequest";
+
+    /**
+     * 上下文
+     */
+    private Context context;
 
     /**
      * 设置client对象
@@ -38,43 +45,57 @@ public class HttpRequest {
     private OkHttpClient client = null;
 
     /**
+     * 构造函数
+     *
+     * @param context 上下文
+     */
+    public HttpRequest(Context context) {
+        this.context = context;
+    }
+
+    /**
      * 获取DNS解析服务对象
+     *
      * @return DNS解析服务
      */
-    public Dns getDns(){
+    public Dns getDns() {
         return null;
     }
 
     /**
      * 获取超时时间
+     *
      * @return 超时时间
      */
-    public long getTimeout(){
+    public long getTimeout() {
         return 15;
     }
 
     /**
      * 超时时间单位
+     *
      * @return 时间单位
      */
-    public TimeUnit getTimeoutUnit(){
+    public TimeUnit getTimeoutUnit() {
         return TimeUnit.SECONDS;
     }
 
     /**
      * 获取网络缓存大小
+     *
      * @return 缓存大小
      */
-    public long getCacheSize(){
+    public long getCacheSize() {
         return 10 * 1024 * 1024;
     }
 
     /**
      * 获取缓存文件
+     *
      * @return 缓存文件
      */
-    public File getCacheFile(){
-        return new File(StorageUtils.getStorageFile(), FCommonGlobalConstant.DIR_HTTP_CACHE);
+    public File getCacheFile() {
+        return new File(StorageUtils.getStoragePackageDir(this.context),FCommonGlobalConfigure.DIR_HTTP_CACHE);
     }
 
     /**
@@ -88,7 +109,7 @@ public class HttpRequest {
                 if (client == null) {
                     OkHttpClient.Builder builder = new OkHttpClient.Builder()
                             .connectTimeout(getTimeout(), getTimeoutUnit());
-                    if (this.getDns()!=null){
+                    if (this.getDns() != null) {
                         builder.dns(this.getDns());
                     }
                     try {//如果能够写入磁盘，则创建缓存目录
@@ -97,6 +118,10 @@ public class HttpRequest {
                             FileUtils.createFolder(file);
                         }
                         builder.cache(new Cache(file.getAbsoluteFile(), getCacheSize()));
+                        Logger.v(TAG, "OkHttpClient[cache-path:" + file.getAbsoluteFile() +
+                                ",cache-size:" + getCacheSize() +
+                                ",timeout:" + getTimeout() +
+                                ",timeoutUnit:" + getTimeoutUnit() + "]");
                     } catch (Exception ignored) {
                     }
                     client = builder.build();
@@ -116,7 +141,7 @@ public class HttpRequest {
      * @param callback 回调
      */
     protected void _request(final String method, final String url, final Map<String, String> params, final Callback callback) {
-        Logger.d(TAG, String.format("_request: method=%s,url=%s,params=%s", method, url, params));
+        Logger.v(TAG, String.format("_request: method=%s,url=%s,params=%s", method, url, params));
         if (url == null) {
             return;
         }
@@ -187,21 +212,21 @@ public class HttpRequest {
      * @param downloadListener 下载监听器
      */
     public void download(final String url, final String toPath, final OnDownloadListener downloadListener) {
-        Logger.d(TAG, String.format("download: url=%s,toPath=%s", url, toPath));
+        Logger.v(TAG, String.format("download: url=%s,toPath=%s", url, toPath));
         if (StringUtils.isEmpty(url) || StringUtils.isEmpty(toPath)) {
-            downloadListener.onDownloadFailed("下载地址或保存路径不可以为空",null);
+            downloadListener.onDownloadFailed("下载地址或保存路径不可以为空", null);
         } else {
             Request builder = new Request.Builder().url(url).build();
             getClient().newCall(builder).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    downloadListener.onDownloadFailed(null,e);
+                    downloadListener.onDownloadFailed(null, e);
                 }
 
                 @Override
-                public void onResponse(Call call, Response response)  {
-                    if(response.body() == null){
-                        downloadListener.onDownloadFailed("下载资源不存在",null);
+                public void onResponse(Call call, Response response) {
+                    if (response.body() == null) {
+                        downloadListener.onDownloadFailed("下载资源不存在", null);
                     }
                     try {
                         // 创建目标文件
@@ -210,8 +235,8 @@ public class HttpRequest {
                             _toPath = _toPath + FileUtils.getNameFromUrl(url);
                         }
                         String outPath = FileUtils.createFile(_toPath, FileUtils.Mode.RELATIVE_PATH_AND_COVER);
-                        if(StringUtils.isEmpty(outPath)){
-                            downloadListener.onDownloadFailed("下载文件保存路径为空",null);
+                        if (StringUtils.isEmpty(outPath)) {
+                            downloadListener.onDownloadFailed("下载文件保存路径为空", null);
                         } else {
                             InputStream is = response.body().byteStream();
                             long total = response.body().contentLength();
@@ -230,7 +255,7 @@ public class HttpRequest {
                             downloadListener.onDownloadSuccess(outPath);
                         }
                     } catch (IOException e) {
-                        downloadListener.onDownloadFailed(null,e);
+                        downloadListener.onDownloadFailed(null, e);
                     }
                 }
             });
@@ -243,6 +268,7 @@ public class HttpRequest {
     public interface OnDownloadListener {
         /**
          * 开始下载前
+         *
          * @param total 总大小
          */
         void beforeDownloading(final long total);
@@ -256,6 +282,7 @@ public class HttpRequest {
 
         /**
          * 下载成功
+         *
          * @param outPath 文件保存绝对路径
          */
         void onDownloadSuccess(String outPath);
@@ -264,7 +291,7 @@ public class HttpRequest {
          * 下载失败
          *
          * @param message 错误消息
-         * @param e 异常类型
+         * @param e       异常类型
          */
         void onDownloadFailed(final String message, final Exception e);
     }

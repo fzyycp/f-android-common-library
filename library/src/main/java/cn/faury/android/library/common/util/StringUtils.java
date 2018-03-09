@@ -13,11 +13,11 @@ import java.util.regex.Pattern;
  */
 public class StringUtils {
 
-    private final static String QQ_REGULAR_EXPRESSION = "[1-9][0-9]{4,14}";
-    private final static String EMAIL_REGULAR_EXPRESSION = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
-    private final static String PHONE_REGULAR_EXPRESSION = "^(1)\\d{10}$";
-    private final static String ZIPCODE_REGULAR_EXPRESSION = "[1-9]\\d{5}(?!\\d)";// 验证邮编
-    private final static String EMPTY = "";
+    public final static String QQ_REGULAR_EXPRESSION = "[1-9][0-9]{4,14}";
+    public final static String EMAIL_REGULAR_EXPRESSION = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
+    public final static String PHONE_REGULAR_EXPRESSION = "^(1)\\d{10}$";
+    public final static String ZIPCODE_REGULAR_EXPRESSION = "[1-9]\\d{5}(?!\\d)";// 验证邮编
+    public final static String EMPTY = "";
 
     /**
      * 判断对象是否为空
@@ -132,13 +132,13 @@ public class StringUtils {
      * @param codePoint 比较的单个字符
      * @return 是否Emoji
      */
-    private static boolean isEmojiCharacter(char codePoint) {
+    public static boolean isEmojiCharacter(char codePoint) {
         return (codePoint == 0x0) || (codePoint == 0x9) || (codePoint == 0xA) || (codePoint == 0xD)
                 || ((codePoint >= 0x20) && (codePoint <= 0xD7FF)) || ((codePoint >= 0xE000) && (codePoint <= 0xFFFD))
                 || ((codePoint >= 0x10000) && (codePoint <= 0x10FFFF));
     }
 
-    private static boolean isPattern(String string, String pattern) {
+    public static boolean isPattern(String string, String pattern) {
         if (isEmpty(string) || isEmpty(pattern)) {
             return false;
         }
@@ -189,7 +189,7 @@ public class StringUtils {
      * @param input 传入判断的字符串
      * @return 字符串是否为JSONObject
      */
-    private static boolean isJSONObject(String input) {
+    public static boolean isJSONObject(String input) {
         boolean isJSONObject = false;
         if (input.startsWith("{") && input.endsWith("}")) {
             try {
@@ -208,7 +208,7 @@ public class StringUtils {
      * @param input 传入判断的字符串
      * @return 字符串是否为JSONArray
      */
-    private static boolean isJSONArray(String input) {
+    public static boolean isJSONArray(String input) {
         boolean isJSONArray = false;
         if (input.startsWith("[") && input.endsWith("]")) {
             input = "{\"fakelist\":" + input + "}";
@@ -222,4 +222,13 @@ public class StringUtils {
         return isJSONArray;
     }
 
+    /**
+     * 格式化数字百分比
+     *
+     * @param number 数字
+     * @return 格式化数字
+     */
+    public static double formatNumberPercent(double number) {
+        return (Math.round(number * 100.00)) / 100.00;
+    }
 }

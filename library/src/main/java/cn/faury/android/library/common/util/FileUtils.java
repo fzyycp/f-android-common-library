@@ -50,11 +50,11 @@ public class FileUtils {
      * @return 绝对路径
      */
     public static File getAbsoluteFile(final String path) {
-        if (StringUtils.isNotEmpty(path) && StringUtils.isNotEmpty(StorageUtils.getStorageDirectory())
-                && path.startsWith(StorageUtils.getStorageDirectory())) {
+        if (StringUtils.isNotEmpty(path) && StringUtils.isNotEmpty(StorageUtils.getStorageDir())
+                && path.startsWith(StorageUtils.getStorageDir())) {
             return new File(path);
         } else {
-            return new File(StorageUtils.getStorageFile(), path);
+            return new File(StorageUtils.getStorageDirFile(), path);
         }
     }
 
@@ -74,7 +74,7 @@ public class FileUtils {
         }
         // 相对路径
         if (mode == Mode.RELATIVE_PATH_AND_COVER || mode == Mode.RELATIVE_PATH_AND_NOTHING) {
-            file = new File(StorageUtils.getStorageFile(), file.getAbsolutePath());
+            file = new File(StorageUtils.getStorageDirFile(), file.getAbsolutePath());
         }
         // 先创建目录
         createFolder(file.getParentFile(), Mode.ABSOLUTE_PATH_AND_NOTHING);
@@ -134,7 +134,7 @@ public class FileUtils {
         }
         // 相对路径
         if (mode == Mode.RELATIVE_PATH_AND_COVER || mode == Mode.RELATIVE_PATH_AND_NOTHING) {
-            folder = new File(StorageUtils.getStorageFile(), folder.getAbsolutePath());
+            folder = new File(StorageUtils.getStorageDirFile(), folder.getAbsolutePath());
         }
         // 覆盖已有的
         if (mode == Mode.RELATIVE_PATH_AND_COVER || mode == Mode.ABSOLUTE_PATH_AND_COVER) {
@@ -585,16 +585,6 @@ public class FileUtils {
     }
 
     // ===========get private directory=================
-
-    /**
-     * 获取私有目录
-     *
-     * @param ctx 上下文
-     * @return 私有目录
-     */
-    public static File getPrivateDir(Context ctx) {
-        return ctx.getFilesDir();
-    }
 
     /**
      * 获取文件大小

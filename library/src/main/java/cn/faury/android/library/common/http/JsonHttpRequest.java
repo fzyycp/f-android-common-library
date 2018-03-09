@@ -1,9 +1,11 @@
 package cn.faury.android.library.common.http;
 
+import android.content.Context;
+
 import java.io.IOException;
 import java.util.Map;
 
-import cn.faury.android.library.common.core.FCommonGlobalConstant;
+import cn.faury.android.library.common.core.FCommonGlobalConfigure;
 import cn.faury.android.library.common.helper.Logger;
 import cn.faury.android.library.common.util.JsonHashMapUtils;
 import cn.faury.android.library.common.util.JsonUtils;
@@ -20,7 +22,16 @@ public class JsonHttpRequest extends HttpRequest {
     /**
      * 日志tag
      */
-    private final String TAG = FCommonGlobalConstant.TAG + " - JsonHttpRequest";
+    private final String TAG = FCommonGlobalConfigure.TAG + " - JsonHttpRequest";
+
+    /**
+     * 构造函数
+     *
+     * @param context 上下文
+     */
+    public JsonHttpRequest(Context context) {
+        super(context);
+    }
 
     /**
      * JSON请求
@@ -42,7 +53,7 @@ public class JsonHttpRequest extends HttpRequest {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Logger.e(TAG, "onResponse: " + response);
+                Logger.v(TAG, "onResponse: " + response);
                 if (handler != null) {
                     if (response.code() == 200) {
                         String resultJson = response.body().string();

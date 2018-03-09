@@ -7,13 +7,14 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
+import cn.faury.android.library.common.core.FCommonGlobalConfigure;
 import cn.faury.android.library.common.helper.Logger;
 
 /**
  * URL Util
  */
 public class UrlUtils {
-    private static final String TAG = UrlUtils.class.getName();
+    private static final String TAG = FCommonGlobalConfigure.TAG + UrlUtils.class.getName();
 
     private static final EncodeInfo FRAGMENT_SPLIT = new EncodeInfo("#", "%23");
 
@@ -45,7 +46,7 @@ public class UrlUtils {
             return null;
         }
 
-        StringBuffer bufferEncodedHost = new StringBuffer();
+        StringBuilder bufferEncodedHost = new StringBuilder();
 
         try {
 
@@ -392,7 +393,7 @@ public class UrlUtils {
         // if this time use the follow codes to check will throws java.lang.IllegalArgumentException: Invalid XXX
         // sequence by URLDecoder.decode
 
-        Logger.d(TAG, "isEncoded，check content：" + content);
+        Logger.v(TAG, "isEncoded，check content：" + content);
 
         for (EncodeInfo info : SPECIAL_CHARACTER_ENCODER_MAP) {
             if (info == null) {
@@ -429,36 +430,27 @@ public class UrlUtils {
 
     public static String getEncodedUrl(String url, String charset, boolean useFragment, boolean blankAsPlus) {
 
-        Logger.d(TAG, "getEncodedUrl，--------------------");
+        Logger.v(TAG, "getEncodedUrl，--------------------");
+        Logger.v(TAG, "getEncodedUrl，准备编码URL，url：" + url);
 
-        Logger.d(TAG, "getEncodedUrl，准备编码URL，url：" + url);
-
-        if (TextUtils.isEmpty(url)) {
+        if (StringUtils.isEmpty(url)) {
             return null;
         }
 
-        // trim url
-        if (url != null) {
-            url = url.trim();
-        }
-
         String encodedUrl = null;
-
         try {
-
             // encoded url
+            URL unEncodeUrl = new URL(url.trim());
 
-            URL unEncodeUrl = new URL(url);
-
-            Logger.d(TAG, "getEncodedUrl，开始编码URL，unEncodeUrl：" + unEncodeUrl);
-            Logger.d(TAG, "getEncodedUrl，开始编码URL，getProtocol：" + unEncodeUrl.getProtocol());
-            Logger.d(TAG, "getEncodedUrl，开始编码URL，getHost：" + unEncodeUrl.getHost());
-            Logger.d(TAG, "getEncodedUrl，开始编码URL，getUserInfo：" + unEncodeUrl.getUserInfo());
-            Logger.d(TAG, "getEncodedUrl，开始编码URL，getPort：" + unEncodeUrl.getPort());
-            Logger.d(TAG, "getEncodedUrl，开始编码URL，getFile：" + unEncodeUrl.getFile());
-            Logger.d(TAG, "getEncodedUrl，开始编码URL，getPath：" + unEncodeUrl.getPath());
-            Logger.d(TAG, "getEncodedUrl，开始编码URL，getQuery：" + unEncodeUrl.getQuery());
-            Logger.d(TAG, "getEncodedUrl，开始编码URL，getRef：" + unEncodeUrl.getRef());
+            Logger.v(TAG, "getEncodedUrl，开始编码URL，unEncodeUrl：" + unEncodeUrl);
+            Logger.v(TAG, "getEncodedUrl，开始编码URL，getProtocol：" + unEncodeUrl.getProtocol());
+            Logger.v(TAG, "getEncodedUrl，开始编码URL，getHost：" + unEncodeUrl.getHost());
+            Logger.v(TAG, "getEncodedUrl，开始编码URL，getUserInfo：" + unEncodeUrl.getUserInfo());
+            Logger.v(TAG, "getEncodedUrl，开始编码URL，getPort：" + unEncodeUrl.getPort());
+            Logger.v(TAG, "getEncodedUrl，开始编码URL，getFile：" + unEncodeUrl.getFile());
+            Logger.v(TAG, "getEncodedUrl，开始编码URL，getPath：" + unEncodeUrl.getPath());
+            Logger.v(TAG, "getEncodedUrl，开始编码URL，getQuery：" + unEncodeUrl.getQuery());
+            Logger.v(TAG, "getEncodedUrl，开始编码URL，getRef：" + unEncodeUrl.getRef());
 
             //  protocol  ://  host  @  userInfo  :  port  /  path  ?  query  #  ref
             //|-protocol-|    |-------host------|  |-port-|   |--------file--------|
@@ -498,7 +490,7 @@ public class UrlUtils {
             encodedUrl = encodedUrl.replaceAll(FRAGMENT_SPLIT.needEncode, FRAGMENT_SPLIT.encoded);
         }
 
-        Logger.e(TAG, "getEncodedUrl，编码后URL，encodedUrl：" + encodedUrl);
+        Logger.v(TAG, "getEncodedUrl，编码后URL，encodedUrl：" + encodedUrl);
 
         return encodedUrl;
     }

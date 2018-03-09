@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 6
-        versionName "0.0.6"
+        versionCode 11
+        versionName "0.1.1"
     }
 
     buildTypes {
@@ -34,7 +34,7 @@ uploadArchives {
         repository(url: "http://128.0.9.253:8081/nexus/content/repositories/releases/") {
             authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
         }
-        pom.version = "0.0.6"
+        pom.version = "0.1.1"
         pom.artifactId = "f-android-common-library"
         pom.groupId = "cn.faury.android.library"
         pom.name = "f-android-common-library"
@@ -50,7 +50,7 @@ publish {
     dryRun = false
     groupId = 'cn.faury.android.library'//jcenter上的路径
     artifactId = 'f-android-common-library'//项目名称
-    publishVersion = '0.0.6'//版本号
+    publishVersion = '0.1.1'//版本号
     desc = 'this is an andriod common library'//描述，不重要
     website = 'https://github.com/fzyycp/f-android-common-library'//github上的地址
 }

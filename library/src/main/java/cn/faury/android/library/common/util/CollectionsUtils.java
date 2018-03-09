@@ -1,5 +1,7 @@
 package cn.faury.android.library.common.util;
 
+import android.content.ContentValues;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -44,6 +46,14 @@ public class CollectionsUtils {
      */
     public static boolean isEmpty(Map<?, ?> map) {
         if (map == null || map.isEmpty() || map.size() == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isEmpty(ContentValues values) {
+        if (values == null || values.size() == 0) {
             return true;
         } else {
             return false;

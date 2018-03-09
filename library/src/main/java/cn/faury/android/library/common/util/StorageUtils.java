@@ -1,15 +1,21 @@
 package cn.faury.android.library.common.util;
 
+import android.content.Context;
 import android.os.Environment;
 import android.os.StatFs;
 
 import java.io.File;
+
+import cn.faury.android.library.common.core.FCommonGlobalConfigure;
+import cn.faury.android.library.common.helper.Logger;
 
 
 /**
  * 存储工具类
  */
 public class StorageUtils {
+
+    private static final String TAG = FCommonGlobalConfigure.TAG + " - StorageUtils";
 
     private final static int DEFAULT_DISPLAY_FORMAT = 0;  //byte
 
@@ -51,9 +57,9 @@ public class StorageUtils {
      *
      * @return storage directory
      */
-    public static String getStorageDirectory() {
+    public static String getStorageDir() {
 
-        File file = getStorageFile();
+        File file = getStorageDirFile();
         if (file == null) {
             return null;
         }
@@ -65,7 +71,7 @@ public class StorageUtils {
      *
      * @return storage directory
      */
-    public static File getStorageFile() {
+    public static File getStorageDirFile() {
 
         if (!isMount()) {
             return null;
@@ -74,9 +80,62 @@ public class StorageUtils {
     }
 
     /**
+     * 获取包存储路径(如果有SD卡获取SD包路径，否则私有路径)
+     *
+     * @param context 上下文
+     * @return 包存储路径
+     */
+    public static String getStoragePackageDir(Context context) {
+        File file = getStoragePackageDirFile(context);
+        if (file == null) {
+            return null;
+        }
+        return file.getAbsolutePath();
+    }
+
+    /**
+     * 获取包存储路径(如果有SD卡获取SD包路径，否则私有路径)
+     *
+     * @param context 上下文
+     * @return 包存储路径
+     */
+    public static File getStoragePackageDirFile(Context context) {
+        File dir;
+        try {
+            // default: /sdcard/Android/data/{package_name}
+            dir = context.getExternalFilesDir(null);
+        } catch (Exception e) {
+            // if there is not sdcard,use /data/data/{package_name} for the default
+            Logger.d(TAG, "has no sdcard", e);
+            dir = context.getFilesDir();
+        }
+        return dir;
+    }
+
+    /**
+     * 获取私有目录
+     *
+     * @param ctx 上下文
+     * @return 私有目录
+     */
+    public static String getStoragePrivateDir(Context ctx) {
+        return getStoragePrivateDirFile(ctx).getAbsolutePath();
+    }
+
+    /**
+     * 获取私有目录
+     *
+     * @param ctx 上下文
+     * @return 私有目录
+     */
+    public static File getStoragePrivateDirFile(Context ctx) {
+        return ctx.getFilesDir();
+    }
+
+    /**
      * To get the storage total volume.
      *
-     * @param format format
+     * @param format   format
      * @param multiple multiple
      * @return storage total volume
      */
@@ -84,7 +143,7 @@ public class StorageUtils {
 
         float unit = DEFAULT_MULTIPLE;
         double total_volume = 0;
-        File file = getStorageFile();
+        File file = getStorageDirFile();
         StatFs sFs = new StatFs(file.getPath());
         long blockSize = sFs.getBlockSize();
         int total = sFs.getBlockCount();
@@ -132,7 +191,7 @@ public class StorageUtils {
     /**
      * To get the storage avialible volume.
      *
-     * @param format format
+     * @param format   format
      * @param multiple multiple
      * @return storage avialable volume
      */
@@ -140,7 +199,7 @@ public class StorageUtils {
 
         float unit = DEFAULT_MULTIPLE;
         double avialable_volume = 0;
-        File file = getStorageFile();
+        File file = getStorageDirFile();
         StatFs sFs = new StatFs(file.getPath());
         long blockSize = sFs.getBlockSize();
         int avialable_blocks = sFs.getAvailableBlocks();
