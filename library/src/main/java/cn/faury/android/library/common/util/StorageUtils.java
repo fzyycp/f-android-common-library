@@ -87,10 +87,7 @@ public class StorageUtils {
      */
     public static String getStoragePackageDir(Context context) {
         File file = getStoragePackageDirFile(context);
-        if (file == null) {
-            return null;
-        }
-        return file.getAbsolutePath();
+        return file == null ? null : file.getAbsolutePath();
     }
 
     /**
@@ -110,6 +107,36 @@ public class StorageUtils {
             dir = context.getFilesDir();
         }
         return dir;
+    }
+
+    /**
+     * 获取library各个包目录
+     *
+     * @param context 上下文
+     * @return library路径
+     */
+    public static String getFauryPackageDir(Context context) {
+        return getFauryPackageDirFile(context).getAbsolutePath();
+    }
+
+    /**
+     * 获取Faury包目录
+     * <p>
+     * <pre>
+     *     优先外部存储Android/data目录
+     *     再程序包私有存储目录
+     *     再拼接上#{@link FCommonGlobalConfigure}.DIR_FAURY
+     * </pre>
+     *
+     * @param context 上下文
+     * @return library路径
+     */
+    public static File getFauryPackageDirFile(Context context) {
+        File file = getStoragePackageDirFile(context);
+        if (file != null) {
+            file = new File(file, FCommonGlobalConfigure.DIR_FAURY);
+        }
+        return file;
     }
 
     /**

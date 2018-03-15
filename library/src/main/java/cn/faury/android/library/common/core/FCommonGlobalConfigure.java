@@ -47,4 +47,9 @@ public final class FCommonGlobalConfigure {
      */
     public static final String DIR_DOWNLOAD = DIR_LIBRARY + File.separator + "download";
 
+    /**
+     * 数据库管理目录
+     */
+    public static final String DIR_SQLITE = DIR_LIBRARY + File.separator + "sqlite";
+
 }

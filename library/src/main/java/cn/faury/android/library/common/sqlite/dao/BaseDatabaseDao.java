@@ -1,4 +1,4 @@
-package cn.faury.android.library.common.helper.sqlite.bean;
+package cn.faury.android.library.common.sqlite.dao;
 
 import android.database.sqlite.SQLiteDatabase;
 
@@ -8,8 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.faury.android.library.common.helper.sqlite.dao.AbstractTableDao;
-import cn.faury.android.library.common.helper.sqlite.dao.DatabaseCallback;
+import cn.faury.android.library.common.helper.Logger;
+import cn.faury.android.library.common.sqlite.DatabaseManager;
+import cn.faury.android.library.common.sqlite.bean.DatabaseInfo;
 import cn.faury.android.library.common.util.CollectionsUtils;
 import cn.faury.android.library.common.util.StringUtils;
 
@@ -18,44 +19,31 @@ import cn.faury.android.library.common.util.StringUtils;
  * 数据库表信息
  */
 
-public abstract class AbstractDatabaseBean implements DatabaseCallback {
+public abstract class BaseDatabaseDao implements IDatabaseCallback {
 
     /**
-     * 管理数据库表名
+     * 标签
      */
-    public static final String TB_NAME = "tb_database_info";
-    /**
-     * 字段名:数据库文件名
-     */
-    public static final String TB_COL_NAME = "DB_NAME";
-    /**
-     * 字段名：数据库版本号
-     */
-    public static final String TB_COL_VERSION = "DB_VERSION";
-    /**
-     * 字段名：数据库存储目录
-     */
-    public static final String TB_COL_DIR = "DB_DIR";
+    protected static final String TAG = BaseDatabaseDao.class.getName();
 
-    /**
-     * 数据库名
-     */
-    private String dbName;
+    private DatabaseInfo databaseInfo;
 
-    /**
-     * 数据库版本号
-     */
-    private int dbVersion = 1;
-
-    /**
-     * 数据库存储目录
-     */
-    private String dir;
+    private DatabaseManager manager;
 
     /**
      * 表集合
      */
-    private Map<String, AbstractTableDao> tablesMap = new HashMap<>();
+    private Map<String, BaseTableDao> tablesMap = new HashMap<>();
+
+    /**
+     * 构造函数
+     *
+     * @param bean    数据库信息
+     */
+    public BaseDatabaseDao(DatabaseInfo bean) {
+        this.databaseInfo = bean;
+        initTablesMap();
+    }
 
     /**
      * 构造函数
@@ -64,16 +52,21 @@ public abstract class AbstractDatabaseBean implements DatabaseCallback {
      * @param dbVersion 版本号
      * @param dir       数据库目录
      */
-    public AbstractDatabaseBean(String dbName, int dbVersion, String dir) {
-        this.dbName = dbName;
-        this.dbVersion = dbVersion;
-        this.dir = dir;
-        initTablesMap();
+    public BaseDatabaseDao(String dbName, int dbVersion, String dir) {
+        this(new DatabaseInfo(dbName, dbVersion, dir));
+    }
+
+    /**
+     * 绑定数据库管理器
+     * @param manager 数据库管理器
+     */
+    public void bindManager(DatabaseManager manager) {
+        this.manager = manager;
     }
 
     private void initTablesMap() {
 
-        List<AbstractTableDao> tablesList = new ArrayList<>();
+        List<BaseTableDao> tablesList = new ArrayList<>();
 
         // 子类注册表信息
         onConfigTablesList(tablesList);
@@ -82,10 +75,11 @@ public abstract class AbstractDatabaseBean implements DatabaseCallback {
             return;
         }
 
-        for (AbstractTableDao tableInfo : tablesList) {
+        for (BaseTableDao tableInfo : tablesList) {
             if (tableInfo == null) {
                 continue;
             }
+            tableInfo.bindDatabaseDao(this);
             String tableName = tableInfo.getTableName();
 
             if (StringUtils.isEmpty(tableName)) {
@@ -105,19 +99,7 @@ public abstract class AbstractDatabaseBean implements DatabaseCallback {
      *
      * @param tablesList 表集合
      */
-    protected abstract void onConfigTablesList(List<AbstractTableDao> tablesList);
-
-    public String getDbName() {
-        return dbName;
-    }
-
-    public int getDbVersion() {
-        return dbVersion;
-    }
-
-    public String getDir() {
-        return dir;
-    }
+    protected abstract void onConfigTablesList(List<BaseTableDao> tablesList);
 
     /**
      * 获取数据库中的表对象
@@ -125,8 +107,29 @@ public abstract class AbstractDatabaseBean implements DatabaseCallback {
      * @param tableName 表名
      * @return 表对象
      */
-    public <T extends AbstractTableDao> T getTableInfo(String tableName) {
+    public <T extends BaseTableDao> T getTableDao(String tableName) {
         return (T) tablesMap.get(tableName);
+    }
+
+    /**
+     * 获取所在数据库管理器
+     *
+     * @return 数据库管理器
+     */
+    public DatabaseManager getManager() {
+        return this.manager;
+    }
+
+    public String getDbName() {
+        return databaseInfo.getDbName();
+    }
+
+    public int getDbVersion() {
+        return databaseInfo.getDbVersion();
+    }
+
+    public String getDir() {
+        return databaseInfo.getDir();
     }
 
     /**
@@ -136,15 +139,19 @@ public abstract class AbstractDatabaseBean implements DatabaseCallback {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Collection<AbstractTableDao> tablesList = tablesMap.values();
+        Collection<BaseTableDao> tablesList = tablesMap.values();
         if (CollectionsUtils.isEmpty(tablesList)) {
             return;
         }
-        for (AbstractTableDao tableInfo : tablesList) {
+        for (BaseTableDao tableInfo : tablesList) {
             if (tableInfo == null) {
                 continue;
             }
-            tableInfo.onCreate(db);
+            try {
+                tableInfo.onCreate(db);
+            } catch (Exception e) {
+                Logger.e(TAG, "onCreate SQL Exception:" + e.getMessage(), e);
+            }
         }
     }
 
@@ -157,11 +164,11 @@ public abstract class AbstractDatabaseBean implements DatabaseCallback {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Collection<AbstractTableDao> tablesList = tablesMap.values();
+        Collection<BaseTableDao> tablesList = tablesMap.values();
         if (CollectionsUtils.isEmpty(tablesList)) {
             return;
         }
-        for (AbstractTableDao tableInfo : tablesList) {
+        for (BaseTableDao tableInfo : tablesList) {
             if (tableInfo == null) {
                 continue;
             }

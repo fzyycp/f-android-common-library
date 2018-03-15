@@ -1,4 +1,4 @@
-package cn.faury.android.library.common.helper.sqlite.dao;
+package cn.faury.android.library.common.sqlite.dao;
 
 import android.database.sqlite.SQLiteDatabase;
 
@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
  * 数据库管理回调
  */
 
-public interface DatabaseCallback {
+public interface IDatabaseCallback {
     /**
      * 创建数据库时执行
      *
