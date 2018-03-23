@@ -52,7 +52,7 @@ public class UrlUtils {
 
             // ----------------------host----------------------
 
-            String[] splitHost = host.split(".");
+            String[] splitHost = host.split("\\.");
 
             // included '.'
             if (!CollectionsUtils.isEmpty(splitHost)) {
@@ -224,9 +224,11 @@ public class UrlUtils {
 
             if (!TextUtils.isEmpty(query)) {
 
-                if (query.contains("\\?") || query.contains("&")) {
-                    bufferEncodedFile.append("?");
-                }
+                bufferEncodedFile.append("?");
+// TODO:fix bug,missing ?
+//                if (query.contains("\\?") || query.contains("&")) {
+//                    bufferEncodedFile.append("?");
+//                }
 
                 String[] splitQuery = query.split("&");
 

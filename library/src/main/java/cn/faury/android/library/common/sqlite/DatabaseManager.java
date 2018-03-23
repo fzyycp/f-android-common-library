@@ -263,7 +263,6 @@ public class DatabaseManager {
         @Override
         public void onCreate(SQLiteDatabase db) {
             super.onCreate(db);
-            Logger.v(TAG, "[database=" + DB_NAME + " version=" + DB_VERSION + "] create success");
         }
 
         /**
@@ -276,7 +275,6 @@ public class DatabaseManager {
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             super.onUpgrade(db, oldVersion, newVersion);
-            Logger.v(TAG, "[database=" + DB_NAME + " version=" + DB_VERSION + "] upgrade success");
         }
     }
 

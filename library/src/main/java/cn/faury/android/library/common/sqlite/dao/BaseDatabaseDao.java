@@ -139,18 +139,19 @@ public abstract class BaseDatabaseDao implements IDatabaseCallback {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Logger.v(TAG, "[database=" + this.getDbName() + " version=" + getDbVersion() + "] create success");
         Collection<BaseTableDao> tablesList = tablesMap.values();
-        if (CollectionsUtils.isEmpty(tablesList)) {
-            return;
-        }
-        for (BaseTableDao tableInfo : tablesList) {
-            if (tableInfo == null) {
-                continue;
-            }
-            try {
-                tableInfo.onCreate(db);
-            } catch (Exception e) {
-                Logger.e(TAG, "onCreate SQL Exception:" + e.getMessage(), e);
+        if (!CollectionsUtils.isEmpty(tablesList)) {
+            for (BaseTableDao tableInfo : tablesList) {
+                if (tableInfo == null) {
+                    continue;
+                }
+                try {
+                    tableInfo.onCreate(db);
+                    Logger.v(TAG, "[database=" + this.getDbName() + " table=" + tableInfo.getTableName() + "] create success");
+                } catch (Exception e) {
+                    Logger.e(TAG, "onCreate SQL Exception:" + e.getMessage(), e);
+                }
             }
         }
     }
@@ -164,15 +165,16 @@ public abstract class BaseDatabaseDao implements IDatabaseCallback {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Logger.v(TAG, "[database=" + getDbName() + " version=" + getDbVersion() + "] upgrade success");
         Collection<BaseTableDao> tablesList = tablesMap.values();
-        if (CollectionsUtils.isEmpty(tablesList)) {
-            return;
-        }
-        for (BaseTableDao tableInfo : tablesList) {
-            if (tableInfo == null) {
-                continue;
+        if (!CollectionsUtils.isEmpty(tablesList)) {
+            for (BaseTableDao tableInfo : tablesList) {
+                if (tableInfo == null) {
+                    continue;
+                }
+                tableInfo.onUpgrade(db, oldVersion, newVersion);
+                Logger.v(TAG, "[database=" + this.getDbName() + " table=" + tableInfo.getTableName() + "] upgrade success");
             }
-            tableInfo.onUpgrade(db, oldVersion, newVersion);
         }
     }
 }
