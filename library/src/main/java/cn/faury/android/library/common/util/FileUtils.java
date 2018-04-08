@@ -420,6 +420,9 @@ public class FileUtils {
 
         FileOutputStream outputStream = null;
         try {
+            if (!dst.exists()){
+                createFolder(dst.getParent());
+            }
             outputStream = new FileOutputStream(dst);
             int readLen = 0;
             byte[] buf = new byte[1024];
@@ -956,6 +959,75 @@ public class FileUtils {
         } catch (Exception e) {
             e.printStackTrace();
             return -1;
+        }
+    }
+
+    /**
+     * 拷贝asset资源到存储器
+     *
+     * @param context  上下文
+     * @param assetDir asset文件夹名
+     * @param destDir  目标目录
+     */
+    public static void copyAssetsDirToDir(Context context, String assetDir, String destDir) throws IOException {
+        String[] files = context.getResources().getAssets().list(assetDir);
+
+        for (int i = 0; i < files.length; i++) {
+            String fileName = files[i];
+            if (StringUtils.isEmpty(assetDir)) {// 根目录
+                // 文件夹名称中不能有点
+                if (fileName.contains(".")) {//文件
+                    copyAssetsFileToDir(context, fileName, destDir);
+                } else {//文件夹
+                    copyAssetsDirToDir(context, fileName, destDir);
+                }
+            } else {//非根目录
+                String filePath = assetDir + File.separator + fileName;
+
+                int idx = assetDir.lastIndexOf(File.separator);
+                String pDir = idx < 0 ? assetDir : assetDir.substring(idx + 1);
+                String destDirPath = destDir + File.separator + pDir;
+                // 文件夹名称中不能有点
+                if (fileName.contains(".")) {//文件
+                    copyAssetsFileToDir(context, filePath, destDirPath);
+                } else {//文件夹
+                    copyAssetsDirToDir(context, filePath, destDirPath);
+                }
+            }
+        }
+    }
+
+    /**
+     * 拷贝asset资源到存储器
+     *
+     * @param context       上下文
+     * @param assetFilePath asset文件名
+     * @param destFilePath  目标文件名
+     */
+    public static void copyAssetsFileToFile(Context context, String assetFilePath, String destFilePath) throws IOException {
+        if (StringUtils.isNotEmpty(assetFilePath)) {
+            File outFile = new File(destFilePath);
+            InputStream in = context.getAssets().open(assetFilePath);
+            FileUtils.createFolder(outFile.getParent());
+            FileUtils.copyFile(in, outFile, true);
+        }
+    }
+
+    /**
+     * 拷贝asset资源到存储器
+     *
+     * @param context       上下文
+     * @param assetFilePath asset文件名
+     * @param destDir       目标目录
+     */
+    public static void copyAssetsFileToDir(Context context, String assetFilePath, String destDir) throws IOException {
+        if (StringUtils.isNotEmpty(assetFilePath)) {
+            int idx = assetFilePath.lastIndexOf(File.separator);
+            String fileName = idx < 0 ? assetFilePath : assetFilePath.substring(idx);
+            File outFile = new File(destDir, fileName);
+            InputStream in = context.getAssets().open(assetFilePath);
+            FileUtils.createFolder(outFile.getParent());
+            FileUtils.copyFile(in, outFile, true);
         }
     }
 

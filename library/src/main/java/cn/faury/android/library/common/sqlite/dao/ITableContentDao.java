@@ -19,6 +19,15 @@ public interface ITableContentDao {
     long insert(ContentValues values);
 
     /**
+     * 插入数据，冲突时处理方案
+     *
+     * @param values            数据
+     * @param conflictAlgorithm 冲突处理
+     * @return -1表示失败，其他表示返回的id
+     */
+    long insertWithOnConflict(ContentValues values, int conflictAlgorithm);
+
+    /**
      * 删除数据
      *
      * @param selection     条件表达式
@@ -30,7 +39,7 @@ public interface ITableContentDao {
     /**
      * 更新数据
      *
-     * @param values 数据.
+     * @param values        数据.
      * @param selection     条件表达式
      * @param selectionArgs 条件表达式参数值
      * @return -1表示失败，其他表示影响行数
@@ -50,6 +59,7 @@ public interface ITableContentDao {
 
     /**
      * 获取数据库操作对象
+     *
      * @return 数据库操作对象
      */
     SQLiteDatabase getDatabase();

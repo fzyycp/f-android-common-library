@@ -98,6 +98,25 @@ public abstract class BaseTableDao implements ITableContentDao, IDatabaseCallbac
         return id;
     }
 
+
+    /**
+     * 插入数据，冲突时处理方案
+     *
+     * @param values            数据
+     * @param conflictAlgorithm 冲突处理
+     * @return -1表示失败，其他表示返回的id
+     */
+    @Override
+    public long insertWithOnConflict(ContentValues values,int conflictAlgorithm) {
+        long id = -1;
+        try {
+            id = getDatabase().insertWithOnConflict(getTableName(), null, values,conflictAlgorithm);
+        } catch (Exception e) {
+            Logger.e(TAG, "insert exception:" + e.getMessage(), e);
+        }
+        return id;
+    }
+
     /**
      * 删除数据
      *
