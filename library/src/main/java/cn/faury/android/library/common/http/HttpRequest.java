@@ -2,6 +2,8 @@ package cn.faury.android.library.common.http;
 
 import android.content.Context;
 
+import org.apache.http.params.HttpParams;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,8 +22,11 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Dns;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -95,7 +100,7 @@ public class HttpRequest {
      * @return 缓存文件
      */
     public File getCacheFile() {
-        return new File(StorageUtils.getStoragePackageDir(this.context),FCommonGlobalConfigure.DIR_HTTP_CACHE);
+        return new File(StorageUtils.getStoragePackageDir(this.context), FCommonGlobalConfigure.DIR_HTTP_CACHE);
     }
 
     /**
@@ -263,6 +268,49 @@ public class HttpRequest {
     }
 
     /**
+     * 多附件混合提交
+     *
+     * @param url      请求地址
+     * @param params   请求参数
+     * @param files    上传附件
+     * @param callback 回调
+     */
+    public void multipart(final String url, final Map<String, String> params, final Map<String, FileWrapper> files, final Callback callback) {
+        Logger.v(TAG, String.format("multipart: url=%s,params=%s,files=%s", url, params, files));
+        if (url == null) {
+            return;
+        }
+        String _url = url;
+        Request.Builder builder = new Request.Builder();
+
+        MultipartBody.Builder multipartBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        // 传入的参数
+        if (params != null && params.size() > 0) {
+            Iterator<Map.Entry<String, String>> iterator = params.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, String> i = iterator.next();
+                multipartBody.addFormDataPart(i.getKey(), (null == i.getValue()) ? "" : i.getValue());
+            }
+        }
+        if (files != null && files.size() > 0) {
+            Iterator<Map.Entry<String, FileWrapper>> iterator = files.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, FileWrapper> i = iterator.next();
+                // 文件存在才上传
+                if (i.getValue()!=null && i.getValue().file!=null && i.getValue().file.exists()){
+                    multipartBody.addFormDataPart(i.getKey(), i.getValue().fileName, RequestBody.create(i.getValue().contentType, i.getValue().file));
+                }
+            }
+        }
+        builder.post(multipartBody.build());
+        Request request = builder.url(_url).build();
+        Call call = getClient().newCall(request);
+        if (call != null) {
+            call.enqueue(callback);
+        }
+    }
+
+    /**
      * 下载监听器
      */
     public interface OnDownloadListener {
@@ -294,5 +342,21 @@ public class HttpRequest {
          * @param e       异常类型
          */
         void onDownloadFailed(final String message, final Exception e);
+    }
+
+    // 上传文件装饰器
+    public static class FileWrapper {
+        // 文件对象
+        public File file;
+        //  文件名
+        public String fileName;
+        // 文件类型
+        public MediaType contentType;
+
+        public FileWrapper(File file, String fileName, MediaType contentType) {
+            this.file = file;
+            this.fileName = fileName;
+            this.contentType = contentType;
+        }
     }
 }
