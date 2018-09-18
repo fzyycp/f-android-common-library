@@ -162,7 +162,7 @@ public final class Logger {
     }
 
     /**
-     * 输出Log.ERROR >= _level信息
+     * 输出Log.ERROR &ge; _level信息
      *
      * @param tag 标签
      * @param msg 消息
